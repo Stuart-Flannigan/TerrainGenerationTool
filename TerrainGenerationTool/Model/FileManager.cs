@@ -23,10 +23,5 @@ namespace TerrainGenerationTool.Model
             else
                 return String.Empty;
         }
-
-        public void LoadFile(string filePath)
-        {
-
-        }
     }
 }

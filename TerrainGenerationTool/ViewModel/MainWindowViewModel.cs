@@ -28,13 +28,9 @@ namespace TerrainGenerationTool.ViewModel
 
         private void SelectFile()
         {
-            Debug.WriteLine("Selecting File");
             FileManager fileManager = new FileManager();
             string path;
             FilePath = (!string.IsNullOrEmpty(path = fileManager.SelectFile("Select Image", "Bitmap files (*.bmp)|*.bmp")) ? path : FilePath);
-            Debug.Write(FilePath);
-
-            
         }
     }
 }
