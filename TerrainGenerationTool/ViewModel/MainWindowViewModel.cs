@@ -21,7 +21,7 @@ namespace TerrainGenerationTool.ViewModel
 
         public MainWindowViewModel()
         {
-            defaultFilePathText = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "TestMap.bmp");
+            defaultFilePathText = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "TestMap.bmp");
 
             Debug.WriteLine(defaultFilePathText);
         }

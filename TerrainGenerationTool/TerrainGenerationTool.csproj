@@ -9,7 +9,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Assets\TestMap.bmp" />
     <None Remove="Synk Gaming.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\TestMap.bmp">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
