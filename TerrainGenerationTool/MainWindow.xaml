@@ -7,6 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
+        <Image x:Name="HeightmapImage" HorizontalAlignment="Left" Height="100" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Source="{Binding FilePath}"/>
+        <TextBlock HorizontalAlignment="Left" Margin="131,21,0,0" TextWrapping="Wrap" Text="Heightmap" VerticalAlignment="Top"/>
+        <TextBox x:Name="PathTextBox" HorizontalAlignment="Left" Margin="131,51,0,0" TextWrapping="Wrap" Text="{Binding FilePath}" VerticalAlignment="Top" Width="300"/>
+        <Button x:Name="PathButton" Content="Select" HorizontalAlignment="Left" Margin="436,49,0,0" VerticalAlignment="Top" Command="{Binding SelectCommand}"/>
 
     </Grid>
 </Window>

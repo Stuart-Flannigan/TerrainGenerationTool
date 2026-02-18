@@ -9,8 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Model\" />
+    <None Remove="Synk Gaming.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="View\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Synk Gaming.png" />
   </ItemGroup>
 
 </Project>
