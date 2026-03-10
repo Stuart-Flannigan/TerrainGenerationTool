@@ -6,6 +6,7 @@ using TerrainGenerationTool.MVVM;
 using TerrainGenerationTool.Model;
 using System.Drawing;
 using System.IO;
+using System.Windows;
 
 namespace TerrainGenerationTool.ViewModel
 {
@@ -13,6 +14,9 @@ namespace TerrainGenerationTool.ViewModel
     {
         private RelayCommand? selectCommand;
         public RelayCommand SelectCommand => selectCommand??= new RelayCommand(execute => SelectFile());
+
+        private RelayCommand? saveCommand;
+        public RelayCommand SaveCommand => saveCommand??= new RelayCommand(execute => { SaveObj(); });
 
         private string? filePath;
         public string FilePath { get => filePath??= defaultFilePathText;  set { filePath = value; OnPropertyChanged(nameof(FilePath)); } }
@@ -31,6 +35,27 @@ namespace TerrainGenerationTool.ViewModel
             FileManager fileManager = new FileManager();
             string path;
             FilePath = (!string.IsNullOrEmpty(path = fileManager.SelectFile("Select Image", "Bitmap files (*.bmp)|*.bmp")) ? path : FilePath);
+        }
+
+        private void SaveObj()
+        {
+            OBJManager objManager = new OBJManager();
+            string modelData = objManager.CreateObjFile();
+            FileManager fileManager = new FileManager();
+            if (fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))
+            {
+                //Successfully made file
+            }
+            else
+            {
+                string messageBoxText = "There was an error creating an OBJ file.";
+                string caption = "Error";
+                MessageBoxButton button = MessageBoxButton.OK;
+                MessageBoxImage icon = MessageBoxImage.Error;
+                MessageBoxResult result;
+
+                result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
+            }
         }
     }
 }

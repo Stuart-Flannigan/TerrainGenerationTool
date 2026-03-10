@@ -23,5 +23,27 @@ namespace TerrainGenerationTool.Model
             else
                 return String.Empty;
         }
+
+        public string SelectFolder()
+        {
+            return string.Empty;
+        }
+
+        public bool GenerateObj(string dataToWrite, string title = "Save File", string filter = "All files (*.*)|*.*")
+        {
+            SaveFileDialog fileDialog = new SaveFileDialog
+            {
+                Filter = filter,
+                Title = title,
+                FileName = "Terrain.obj"
+            };
+
+            if (fileDialog.ShowDialog() == true)
+            {
+                // ToDo: Make Save
+                File.WriteAllText(fileDialog.FileName, dataToWrite);
+            }
+            return true;
+        }
     }
 }
