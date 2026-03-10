@@ -15,6 +15,7 @@ namespace TerrainGenerationTool.Model
             if (scale.x != scale.y)
                 vertexHeight = scale.y * 2 + 1;
 
+            string fileData = string.Empty;
             Vector3[] verticies = new Vector3[vertexWidth * vertexHeight];
 
             int index = 0;
@@ -23,16 +24,28 @@ namespace TerrainGenerationTool.Model
                 for (int j = -scale.y; j <= scale.y; j++)
                 {
                     verticies[index] = new Vector3() { x = i, y = 0, z = j };
+
+                    fileData += $"v {verticies[index].x} {verticies[index].y} {verticies[index].z}\n";
+
                     index++;
                 }
             }
 
-            foreach (Vector3 vertex in verticies)
+            Debug.Write(fileData);
+
+            for (int i = -scale.x; i < scale.x; i++)
             {
-                Debug.WriteLine($"v {vertex.x} {vertex.y} {vertex.z}");
+                for (int j = -scale.y; j < scale.y; j++)
+                {
+                    Vector3 topTriangle = new Vector3(
+                        i * 2 + j * vertexWidth,
+                        i * 2 + 1 + j * vertexWidth,
+                        i * 2 + vertexWidth + 1 + j * vertexWidth
+                        );
+
+                    Vector3 bottomTriangle = new Vector3(0, 0, 0);
+                }
             }
-
-
 
 
             string tempData =
