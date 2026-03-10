@@ -40,7 +40,7 @@ namespace TerrainGenerationTool.ViewModel
         private void SaveObj()
         {
             OBJManager objManager = new OBJManager();
-            string modelData = objManager.CreateObjFile();
+            string modelData = objManager.CreateObjFile(new Vector2(2, 2));
             FileManager fileManager = new FileManager();
             if (fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))
             {
