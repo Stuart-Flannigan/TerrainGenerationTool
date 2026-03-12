@@ -73,7 +73,7 @@ namespace TerrainGenerationTool.ViewModel
 
             OBJManager objManager = new OBJManager();
             Bitmap heightmap = new Bitmap(FilePath);
-            string modelData = objManager.CreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue)).Result;
+            string modelData = objManager.CreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue));
 
             FileManager fileManager = new FileManager();
             if (fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))

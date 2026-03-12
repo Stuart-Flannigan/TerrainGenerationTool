@@ -20,7 +20,7 @@ namespace TerrainGenerationTool.Model
         """;
 
 
-        public async Task<string> CreateObjFile(Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
+        public string CreateObjFile(Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
         {
             int vertexWidth = scale.x * 2 + 1;
             int vertexHeight = vertexWidth;
@@ -37,7 +37,7 @@ namespace TerrainGenerationTool.Model
             Debug.WriteLine($"Heightmap Scale: {scaleDifference.x}, {scaleDifference.y}");
             Debug.WriteLine("");
 
-            string fileData = string.Empty;
+            StringBuilder fileData = new StringBuilder();
             Vector3F[] verticies = new Vector3F[vertexWidth * vertexHeight];
             Vector2F[] textureCoords = new Vector2F[vertexWidth * vertexHeight];
             Vector3F[] normals = new Vector3F[vertexWidth * vertexHeight];
@@ -62,13 +62,13 @@ namespace TerrainGenerationTool.Model
 
                     verticies[index] = new Vector3F() { x = i, y = height, z = j };
 
-                    fileData += $"v {verticies[index].x} {verticies[index].y} {verticies[index].z}\n";
+                    fileData.AppendLine($"v {verticies[index].x} {verticies[index].y} {verticies[index].z}");
 
                     index++;
                 }
             }
 
-            fileData += "\n";
+            fileData.AppendLine("");
 
             /*
              * -------------------
@@ -81,10 +81,10 @@ namespace TerrainGenerationTool.Model
                 float u = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
                 float v = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
 
-                fileData += $"vt {u} {v}\n";
+                fileData.AppendLine($"vt {u} {v}");
             }
 
-            fileData += "\n";
+            fileData.AppendLine("");
 
             /*
              * -----
@@ -103,7 +103,7 @@ namespace TerrainGenerationTool.Model
                         (i + 1) + ((j + 1) * vertexHeight) 
                         );
 
-                    fileData += $"f {triangles[index].x} {triangles[index].y} {triangles[index].z}\n";
+                    fileData.AppendLine($"f {triangles[index].x} {triangles[index].y} {triangles[index].z}");
 
                     index++;
 
@@ -113,7 +113,7 @@ namespace TerrainGenerationTool.Model
                         (i) + ((j + 1) * vertexHeight)
                         );
 
-                    fileData += $"f {triangles[index].x} {triangles[index].y} {triangles[index].z}\n";
+                    fileData.AppendLine($"f {triangles[index].x} {triangles[index].y} {triangles[index].z}");
 
                     index++;
                 }
@@ -150,18 +150,16 @@ namespace TerrainGenerationTool.Model
             for (int i = 0; i < normals.Length; i++)
             {
                 normals[i] = Vector3F.Normalise(normals[i]);
-                fileData += $"vn {normals[i].x} {normals[i].y} {normals[i].z}\n";
+                fileData.AppendLine($"vn {normals[i].x} {normals[i].y} {normals[i].z}");
                 Debug.WriteLine($"Normal {i}: {normals[i].x}, {normals[i].y}, {normals[i].z}");
             }
-
-            fileData += "\n";
 
 
             //////
 
             Debug.Write(fileData);
 
-            return fileData;
+            return fileData.ToString();
         }
     }
 }
