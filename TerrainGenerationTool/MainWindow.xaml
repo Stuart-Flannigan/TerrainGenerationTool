@@ -12,6 +12,8 @@
         <TextBox x:Name="PathTextBox" HorizontalAlignment="Left" Margin="131,51,0,0" TextWrapping="Wrap" Text="{Binding FilePath}" VerticalAlignment="Top" Width="300"/>
         <Button x:Name="PathButton" Content="Select" HorizontalAlignment="Left" Margin="436,49,0,0" VerticalAlignment="Top" Command="{Binding SelectCommand}"/>
         <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="436,86,0,0" VerticalAlignment="Top" Command="{Binding SaveCommand}"/>
-
+        <TextBox x:Name="SizeXTextBox" HorizontalAlignment="Left" Margin="131,109,0,0" TextWrapping="Wrap" Text="{Binding XValue}" VerticalAlignment="Top" Width="50" />
+        <TextBox x:Name="SizeYTextBox" HorizontalAlignment="Left" Margin="191,109,0,0" TextWrapping="Wrap" Text="{Binding YValue}" VerticalAlignment="Top" Width="50"/>
+        <TextBox x:Name="MagnitudeTextBox" HorizontalAlignment="Left" Margin="131,149,0,0" TextWrapping="Wrap" Text="{Binding MagnitudeValue}" VerticalAlignment="Top" Width="100"/>
     </Grid>
 </Window>

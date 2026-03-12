@@ -23,11 +23,30 @@ namespace TerrainGenerationTool.ViewModel
 
         private string defaultFilePathText;
 
+        private string? xValue;
+        public string XValue { get => xValue ??= defaultXValue; set { xValue = value; OnPropertyChanged(nameof(XValue)); } }
+
+        private string defaultXValue;
+
+        private string? yValue;
+        public string YValue { get => yValue ??= defaultYValue; set { yValue = value; OnPropertyChanged(nameof(YValue)); } }
+
+        private string defaultYValue;
+
+        private string? magnitudeValue;
+        public string MagnitudeValue { get => magnitudeValue ??= defaultMagnitudeValue; set { magnitudeValue = value; OnPropertyChanged(nameof(MagnitudeValue)); } }
+
+        private string defaultMagnitudeValue;
+
         public MainWindowViewModel()
         {
             defaultFilePathText = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "TestMap.bmp");
 
             Debug.WriteLine(defaultFilePathText);
+
+            defaultXValue = "63";
+            defaultYValue = "63";
+            defaultMagnitudeValue = "10.0";
         }
 
         private void SelectFile()
@@ -41,7 +60,7 @@ namespace TerrainGenerationTool.ViewModel
         {
             OBJManager objManager = new OBJManager();
             Bitmap heightmap = new Bitmap(FilePath);
-            string modelData = objManager.CreateObjFile(new Vector2(63, 63), heightmap, 50.0f);
+            string modelData = objManager.CreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue));
             FileManager fileManager = new FileManager();
             if (fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))
             {
