@@ -20,7 +20,7 @@ namespace TerrainGenerationTool.Model
         """;
 
 
-        public string CreateObjFile(Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
+        public async Task<string> CreateObjFile(Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
         {
             int vertexWidth = scale.x * 2 + 1;
             int vertexHeight = vertexWidth;
@@ -58,7 +58,7 @@ namespace TerrainGenerationTool.Model
   
                     Color pixelColour = heightmap.GetPixel(heightmapPos.x, heightmapPos.y);
                     float saturation = ((pixelColour.R / 255f) + (pixelColour.G / 255f) + (pixelColour.B / 255f)) / 3;
-                    float height = (1 - saturation) * magnitude;
+                    float height = saturation * magnitude;
 
                     verticies[index] = new Vector3F() { x = i, y = height, z = j };
 
@@ -75,6 +75,14 @@ namespace TerrainGenerationTool.Model
              * Texture Coordinates
              * -------------------
             **/
+
+            for(int i = 0; i < verticies.Length; i++)
+            {
+                float u = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
+                float v = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
+
+                fileData += $"vt {u} {v}\n";
+            }
 
             fileData += "\n";
 

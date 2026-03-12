@@ -63,9 +63,18 @@ namespace TerrainGenerationTool.ViewModel
 
         private void SaveObj()
         {
+            string msgBoxText = "Generating OBJ";
+            string cap = "Generating...";
+            MessageBoxButton btn = MessageBoxButton.OK;
+            MessageBoxImage icn = MessageBoxImage.Exclamation;
+            MessageBoxResult rst = MessageBoxResult.Yes;
+
+            MessageBox.Show(msgBoxText, cap, btn, icn, rst);
+
             OBJManager objManager = new OBJManager();
             Bitmap heightmap = new Bitmap(FilePath);
-            string modelData = objManager.CreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue));
+            string modelData = objManager.CreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue)).Result;
+
             FileManager fileManager = new FileManager();
             if (fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))
             {
@@ -77,9 +86,9 @@ namespace TerrainGenerationTool.ViewModel
                 string caption = "Error";
                 MessageBoxButton button = MessageBoxButton.OK;
                 MessageBoxImage icon = MessageBoxImage.Error;
-                MessageBoxResult result;
+                MessageBoxResult result = MessageBoxResult.Yes;
 
-                result = MessageBox.Show(messageBoxText, caption, button, icon, MessageBoxResult.Yes);
+                result = MessageBox.Show(messageBoxText, caption, button, icon, result);
             }
         }
     }
