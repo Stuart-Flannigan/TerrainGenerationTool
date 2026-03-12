@@ -39,7 +39,15 @@ namespace TerrainGenerationTool.Model
 
             string fileData = string.Empty;
             Vector3F[] verticies = new Vector3F[vertexWidth * vertexHeight];
+            Vector2F[] textureCoords = new Vector2F[vertexWidth * vertexHeight];
+            Vector3F[] normals = new Vector3F[vertexWidth * vertexHeight];
             Vector3[] triangles = new Vector3[(scale.x * 4) * (scale.y * 4)];
+            
+            /*
+             * ---------
+             * Verticies
+             * ---------
+            **/
 
             int index = 0;
             for(int i = -scale.x; i <= scale.x; i++)
@@ -47,15 +55,10 @@ namespace TerrainGenerationTool.Model
                 for (int j = -scale.y; j <= scale.y; j++)
                 {
                     Vector2 heightmapPos = new Vector2((int)((i + scale.x) * scaleDifference.x), (int)((j + scale.y) * scaleDifference.y));
-                    Debug.WriteLine($"Heightmap Pixel: {heightmapPos.x}, {heightmapPos.y}");
-
+  
                     Color pixelColour = heightmap.GetPixel(heightmapPos.x, heightmapPos.y);
-                    float saturation = (((pixelColour.R / 255f) + (pixelColour.G / 255f) + (pixelColour.B / 255f)) / 3);
+                    float saturation = ((pixelColour.R / 255f) + (pixelColour.G / 255f) + (pixelColour.B / 255f)) / 3;
                     float height = (1 - saturation) * magnitude;
-
-                    Debug.WriteLine($"Saturation: {saturation}");
-                    Debug.WriteLine($"Height: {height}");
-                    Debug.WriteLine("");
 
                     verticies[index] = new Vector3F() { x = i, y = height, z = j };
 
@@ -66,6 +69,20 @@ namespace TerrainGenerationTool.Model
             }
 
             fileData += "\n";
+
+            /*
+             * -------------------
+             * Texture Coordinates
+             * -------------------
+            **/
+
+            fileData += "\n";
+
+            /*
+             * -----
+             * Faces
+             * -----
+            **/
 
             index = 0;
             for (int i = 1; i < vertexWidth; i++)
@@ -93,6 +110,35 @@ namespace TerrainGenerationTool.Model
                     index++;
                 }
             }
+
+            /*
+             * -------
+             * Normals
+             * -------
+            **/
+
+            index = 0;
+            for (int i = 0; i < triangles.Length; i++)
+            {
+                Vector3F a = new Vector3F(verticies[triangles[i].x].x, verticies[triangles[i].x].y, verticies[triangles[i].x].z);
+                Vector3F b = new Vector3F(verticies[triangles[i].y].x, verticies[triangles[i].y].y, verticies[triangles[i].y].z);
+                Vector3F c = new Vector3F(verticies[triangles[i].z].x, verticies[triangles[i].z].y, verticies[triangles[i].z].z);
+
+                Vector3F ab = b - a;
+                Vector3F ac = c - a;
+
+                Vector3F cross = Vector3F.Cross(ab, ac);
+                Vector3F normal = Vector3F.Normalise(cross);
+
+                normals[triangles[i].x] += normal;
+                normals[triangles[i].y] += normal;
+                normals[triangles[i].z] += normal;
+            }
+
+            fileData += "\n";
+
+
+            //////
 
             Debug.Write(fileData);
 

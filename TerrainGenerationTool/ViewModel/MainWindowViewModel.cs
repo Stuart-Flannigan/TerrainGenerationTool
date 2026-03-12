@@ -47,6 +47,11 @@ namespace TerrainGenerationTool.ViewModel
             defaultXValue = "63";
             defaultYValue = "63";
             defaultMagnitudeValue = "10.0";
+
+            Vector3F a = new Vector3F(2, 3, 5);
+
+            double mag = Vector3F.Magnitude(a);
+            Debug.WriteLine($"Mag: {mag}");
         }
 
         private void SelectFile()
