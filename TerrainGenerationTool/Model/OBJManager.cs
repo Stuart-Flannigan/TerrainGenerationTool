@@ -31,24 +31,33 @@ namespace TerrainGenerationTool.Model
                 }
             }
 
-            Debug.Write(fileData);
+            fileData += "\n";
 
-            for (int i = -scale.x; i < scale.x; i++)
+            for (int i = 1; i < vertexWidth; i++)
             {
-                for (int j = -scale.y; j < scale.y; j++)
+                for (int j = 0; j < vertexHeight; j++)
                 {
                     Vector3 topTriangle = new Vector3(
-                        i * 2 + j * vertexWidth,
-                        i * 2 + 1 + j * vertexWidth,
-                        i * 2 + vertexWidth + 1 + j * vertexWidth
+                        i + (j * vertexHeight),
+                        (i + 1) + (j * vertexHeight),
+                        (i + 1) + ((j + 1) * vertexHeight) 
                         );
 
-                    Vector3 bottomTriangle = new Vector3(0, 0, 0);
+                    fileData += $"f {topTriangle.x} {topTriangle.y} {topTriangle.z}\n";
+
+                    Vector3 bottomTriangle = new Vector3(
+                        i + (j * vertexHeight),
+                        (i + 1) + ((j + 1) * vertexHeight),
+                        (i) + ((j + 1) * vertexHeight)
+                        );
+
+                    fileData += $"f {bottomTriangle.x} {bottomTriangle.y} {bottomTriangle.z}\n";
                 }
             }
 
+            Debug.Write(fileData);
 
-            string tempData =
+            /*string tempData =
                 """
                 v -1 0 -1
                 v 1 0 -1
@@ -57,9 +66,9 @@ namespace TerrainGenerationTool.Model
 
                 f 1 2 3
                 f 1 3 4
-                """;
+                """;*/
 
-            return tempData;
+            return fileData;
         }
     }
 }
