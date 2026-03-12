@@ -72,11 +72,24 @@ namespace TerrainGenerationTool.Model
         {
             double magnitude = Magnitude(vector);
 
-            return new Vector3F(
+            float oldX = vector.x;
+            float oldY = vector.y;
+            float oldZ = vector.z;
+
+            Vector3F newXYZ = new Vector3F(
                 vector.x / (float)magnitude,
                 vector.y / (float)magnitude,
                 vector.z / (float)magnitude
                 );
+
+            if(oldX == 0)
+                newXYZ.x = 0;
+            if (oldY == 0)
+                newXYZ.y = 0;
+            if (oldZ == 0)
+                newXYZ.z = 0;
+
+            return newXYZ;
         }
 
         public static double Magnitude(Vector3F vector)

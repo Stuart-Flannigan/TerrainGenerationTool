@@ -85,9 +85,9 @@ namespace TerrainGenerationTool.Model
             **/
 
             index = 0;
-            for (int i = 1; i < vertexWidth; i++)
+            for (int i = 1; i < vertexWidth - 1; i++)
             {
-                for (int j = 0; j < vertexHeight; j++)
+                for (int j = 0; j < vertexHeight - 1; j++)
                 {
                     triangles[index] = new Vector3(
                         i + (j * vertexHeight),
@@ -118,11 +118,13 @@ namespace TerrainGenerationTool.Model
             **/
 
             index = 0;
-            for (int i = 0; i < triangles.Length; i++)
+            for (int i = 0; i < triangles.Length - 1; i++)
             {
+                Debug.WriteLine($"Triangle {i} of {triangles.Length}");
+                Debug.WriteLine($"Vertex Indicies: {triangles[i].x}, {triangles[i].y}, {triangles[i].z} of {verticies.Length}");
                 Vector3F a = new Vector3F(verticies[triangles[i].x].x, verticies[triangles[i].x].y, verticies[triangles[i].x].z);
                 Vector3F b = new Vector3F(verticies[triangles[i].y].x, verticies[triangles[i].y].y, verticies[triangles[i].y].z);
-                Vector3F c = new Vector3F(verticies[triangles[i].z].x, verticies[triangles[i].z].y, verticies[triangles[i].z].z);
+                Vector3F c = new Vector3F(verticies[triangles[i].z].x, verticies[triangles[i].z ].y, verticies[triangles[i].z].z);
 
                 Vector3F ab = b - a;
                 Vector3F ac = c - a;
@@ -133,6 +135,15 @@ namespace TerrainGenerationTool.Model
                 normals[triangles[i].x] += normal;
                 normals[triangles[i].y] += normal;
                 normals[triangles[i].z] += normal;
+            }
+
+            // Must Normalise the normals
+
+            for (int i = 0; i < normals.Length; i++)
+            {
+                normals[i] = Vector3F.Normalise(normals[i]);
+                fileData += $"vn {normals[i].x} {normals[i].y} {normals[i].z}\n";
+                Debug.WriteLine($"Normal {i}: {normals[i].x}, {normals[i].y}, {normals[i].z}");
             }
 
             fileData += "\n";
