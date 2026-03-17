@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Diagnostics;
 using System.Drawing;
+using System.Text;
+using System.Windows;
 
 namespace TerrainGenerationTool.Model
 {
@@ -37,12 +38,12 @@ namespace TerrainGenerationTool.Model
             Debug.WriteLine($"Heightmap Scale: {scaleDifference.x}, {scaleDifference.y}");
             Debug.WriteLine("");
 
-            StringBuilder fileData = new StringBuilder();
             Vector3F[] verticies = new Vector3F[vertexWidth * vertexHeight];
             Vector2F[] textureCoords = new Vector2F[vertexWidth * vertexHeight];
             Vector3F[] normals = new Vector3F[vertexWidth * vertexHeight];
             Vector3[] triangles = new Vector3[(scale.x * 4) * (scale.y * 4)];
-            
+            StringBuilder fileData = new StringBuilder(verticies.Length + textureCoords.Length + normals.Length + triangles.Length);
+
             /*
              * ---------
              * Verticies
@@ -65,10 +66,13 @@ namespace TerrainGenerationTool.Model
                     fileData.AppendLine($"v {verticies[index].x} {verticies[index].y} {verticies[index].z}");
 
                     index++;
+                    Task.Yield();
                 }
             }
 
             fileData.AppendLine("");
+
+            MessageBox.Show("Completed verticies", "verticies", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
 
             /*
              * -------------------
@@ -76,15 +80,19 @@ namespace TerrainGenerationTool.Model
              * -------------------
             **/
 
-            for(int i = 0; i < verticies.Length; i++)
+            for (int i = 0; i < verticies.Length; i++)
             {
                 float u = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
                 float v = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
 
                 fileData.AppendLine($"vt {u} {v}");
+
+                Task.Yield();
             }
 
             fileData.AppendLine("");
+
+            MessageBox.Show("Completed texture coords", "Textre Coords", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
 
             /*
              * -----
@@ -116,14 +124,19 @@ namespace TerrainGenerationTool.Model
                     fileData.AppendLine($"f {triangles[index].x} {triangles[index].y} {triangles[index].z}");
 
                     index++;
+                    Task.Yield();
                 }
             }
+
+            MessageBox.Show("Completed Triangles", "Triangles", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
 
             /*
              * -------
              * Normals
              * -------
             **/
+
+            // Bottleneck here - due to the Normalise function using square roots
 
             index = 0;
             for (int i = 0; i < triangles.Length - 1; i++)
@@ -143,7 +156,11 @@ namespace TerrainGenerationTool.Model
                 normals[triangles[i].x] += normal;
                 normals[triangles[i].y] += normal;
                 normals[triangles[i].z] += normal;
+
+                Task.Yield();
             }
+
+            MessageBox.Show("Generated normals", "Normals", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
 
             // Must Normalise the normals
 
@@ -152,12 +169,15 @@ namespace TerrainGenerationTool.Model
                 normals[i] = Vector3F.Normalise(normals[i]);
                 fileData.AppendLine($"vn {normals[i].x} {normals[i].y} {normals[i].z}");
                 Debug.WriteLine($"Normal {i}: {normals[i].x}, {normals[i].y}, {normals[i].z}");
+
+                Task.Yield();
             }
 
+            MessageBox.Show("Completed normals", "Normals", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
 
             //////
 
-            Debug.Write(fileData);
+            //Debug.Write(fileData);
 
             return fileData.ToString();
         }
