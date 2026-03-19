@@ -38,11 +38,11 @@ namespace TerrainGenerationTool.Model
             Debug.WriteLine($"Heightmap Scale: {scaleDifference.x}, {scaleDifference.y}");
             Debug.WriteLine("");
 
-            Vector3F[] verticies = new Vector3F[vertexWidth * vertexHeight];
-            Vector2F[] textureCoords = new Vector2F[vertexWidth * vertexHeight];
-            Vector3F[] normals = new Vector3F[vertexWidth * vertexHeight];
-            Vector3[] triangles = new Vector3[(scale.x * 4) * (scale.y * 4)];
-            StringBuilder fileData = new StringBuilder(verticies.Length + textureCoords.Length + normals.Length + triangles.Length);
+            List<Vector3F> verticies = new List<Vector3F>();
+            List<Vector2F> textureCoords = new List<Vector2F>();
+            List<Vector3F> normals = new List<Vector3F>();
+            List<Vector3> triangles = new List<Vector3>();
+            StringBuilder fileData = new StringBuilder(4 * (vertexHeight * vertexWidth));
 
             /*
              * ---------
@@ -61,7 +61,7 @@ namespace TerrainGenerationTool.Model
                     float saturation = ((pixelColour.R / 255f) + (pixelColour.G / 255f) + (pixelColour.B / 255f)) / 3;
                     float height = saturation * magnitude;
 
-                    verticies[index] = new Vector3F() { x = i, y = height, z = j };
+                    verticies.Add(new Vector3F() { x = i, y = height, z = j });
 
                     fileData.AppendLine($"v {verticies[index].x} {verticies[index].y} {verticies[index].z}");
 
@@ -80,10 +80,10 @@ namespace TerrainGenerationTool.Model
              * -------------------
             **/
 
-            for (int i = 0; i < verticies.Length; i++)
+            for (int i = 0; i < verticies.Count; i++)
             {
                 float u = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
-                float v = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
+                float v = (verticies[i].y - (-scale.y)) / (scale.y - (-scale.y));
 
                 fileData.AppendLine($"vt {u} {v}");
 
@@ -100,26 +100,28 @@ namespace TerrainGenerationTool.Model
              * -----
             **/
 
+            fileData.AppendLine("s1");
+
             index = 0;
             for (int i = 1; i < vertexWidth - 1; i++)
             {
                 for (int j = 0; j < vertexHeight - 1; j++)
                 {
-                    triangles[index] = new Vector3(
-                        i + (j * vertexHeight),
-                        (i + 1) + (j * vertexHeight),
-                        (i + 1) + ((j + 1) * vertexHeight) 
-                        );
+                    triangles.Add(new Vector3(
+                        i + (j * vertexWidth),
+                        (i + 1) + (j * vertexWidth),
+                        (i + 1) + ((j + 1) * vertexWidth) 
+                        ));
 
                     fileData.AppendLine($"f {triangles[index].x} {triangles[index].y} {triangles[index].z}");
 
                     index++;
 
-                    triangles[index] = new Vector3(
+                    triangles.Add(new Vector3(
                         i + (j * vertexHeight),
                         (i + 1) + ((j + 1) * vertexHeight),
                         (i) + ((j + 1) * vertexHeight)
-                        );
+                        ));
 
                     fileData.AppendLine($"f {triangles[index].x} {triangles[index].y} {triangles[index].z}");
 
@@ -136,16 +138,19 @@ namespace TerrainGenerationTool.Model
              * -------
             **/
 
+            for (int i = 0; i < verticies.Count; i++)
+                normals.Add(new Vector3F(0, 0, 0));
+
             // Bottleneck here - due to the Normalise function using square roots
 
             index = 0;
-            for (int i = 0; i < triangles.Length - 1; i++)
+            for (int i = 0; i < triangles.Count; i++)
             {
-                Debug.WriteLine($"Triangle {i} of {triangles.Length}");
-                Debug.WriteLine($"Vertex Indicies: {triangles[i].x}, {triangles[i].y}, {triangles[i].z} of {verticies.Length}");
-                Vector3F a = new Vector3F(verticies[triangles[i].x].x, verticies[triangles[i].x].y, verticies[triangles[i].x].z);
-                Vector3F b = new Vector3F(verticies[triangles[i].y].x, verticies[triangles[i].y].y, verticies[triangles[i].y].z);
-                Vector3F c = new Vector3F(verticies[triangles[i].z].x, verticies[triangles[i].z ].y, verticies[triangles[i].z].z);
+                Debug.WriteLine($"Triangle {i} of {triangles.Count}");
+                Debug.WriteLine($"Vertex Indicies: {triangles[i].x}, {triangles[i].y}, {triangles[i].z} of {verticies.Count}");
+                Vector3F a = new Vector3F(verticies[triangles[i].x - 1].x, verticies[triangles[i].x - 1].y, verticies[triangles[i].x - 1].z);
+                Vector3F b = new Vector3F(verticies[triangles[i].y - 1].x, verticies[triangles[i].y - 1].y, verticies[triangles[i].y - 1].z);
+                Vector3F c = new Vector3F(verticies[triangles[i].z - 1].x, verticies[triangles[i].z - 1].y, verticies[triangles[i].z - 1].z);
 
                 Vector3F ab = b - a;
                 Vector3F ac = c - a;
@@ -153,9 +158,9 @@ namespace TerrainGenerationTool.Model
                 Vector3F cross = Vector3F.Cross(ab, ac);
                 Vector3F normal = Vector3F.Normalise(cross);
 
-                normals[triangles[i].x] += normal;
-                normals[triangles[i].y] += normal;
-                normals[triangles[i].z] += normal;
+                normals[triangles[i].x - 1] += normal;
+                normals[triangles[i].y - 1] += normal;
+                normals[triangles[i].z - 1] += normal;
 
                 Task.Yield();
             }
@@ -164,11 +169,11 @@ namespace TerrainGenerationTool.Model
 
             // Must Normalise the normals
 
-            for (int i = 0; i < normals.Length; i++)
+            for (int i = 0; i < normals.Count; i++)
             {
                 normals[i] = Vector3F.Normalise(normals[i]);
                 fileData.AppendLine($"vn {normals[i].x} {normals[i].y} {normals[i].z}");
-                Debug.WriteLine($"Normal {i}: {normals[i].x}, {normals[i].y}, {normals[i].z}");
+                //Debug.WriteLine($"Normal {i}: {normals[i].x}, {normals[i].y}, {normals[i].z}");
 
                 Task.Yield();
             }
