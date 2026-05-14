@@ -63,10 +63,9 @@ namespace TerrainGenerationTool.Model
 
                     verticies.Add(new Vector3F() { x = i, y = height, z = j });
 
-                    fileData.AppendLine($"v {verticies[index].x} {verticies[index].y} {verticies[index].z}");
+                    fileData.AppendLine($"v {verticies[index].x} {verticies[index].y} {verticies[index].z }");
 
                     index++;
-                    Task.Yield();
                 }
             }
 
@@ -80,14 +79,19 @@ namespace TerrainGenerationTool.Model
              * -------------------
             **/
 
+            const float baseTile = 1.0f;
+            const float tileScale = 3.0f;
+
             for (int i = 0; i < verticies.Count; i++)
             {
-                float u = (verticies[i].x - (-scale.x)) / (scale.x - (-scale.x));
-                float v = (verticies[i].y - (-scale.y)) / (scale.y - (-scale.y));
+                float steepness = 1.0f - Math.Abs(verticies[i].y);
+                float steepScale = 1.0f + (steepness * tileScale);
+                float totalScale = baseTile * steepScale;
+
+                float u = ((verticies[i].x - (-scale.x)) / (2 * scale.x)) * totalScale;
+                float v = ((verticies[i].z - (-scale.y)) / (2 * scale.y)) * totalScale;
 
                 fileData.AppendLine($"vt {u} {v}");
-
-                Task.Yield();
             }
 
             fileData.AppendLine("");
@@ -103,30 +107,26 @@ namespace TerrainGenerationTool.Model
             fileData.AppendLine("s1");
 
             index = 0;
-            for (int i = 1; i < vertexWidth - 1; i++)
+            for (int i = 0; i < vertexWidth - 1; i++)
             {
                 for (int j = 0; j < vertexHeight - 1; j++)
                 {
-                    triangles.Add(new Vector3(
-                        i + (j * vertexWidth),
-                        (i + 1) + (j * vertexWidth),
-                        (i + 1) + ((j + 1) * vertexWidth) 
-                        ));
+                    int a = j + (i * vertexHeight);
+                    int b = (j + 1) + (i * vertexHeight);
+                    int c = j + ((i + 1) * vertexHeight);
+                    int d = (j + 1) + ((i + 1) * vertexHeight);
 
-                    fileData.AppendLine($"f {triangles[index].x} {triangles[index].y} {triangles[index].z}");
+                    triangles.Add(new Vector3(a, b, c));
 
-                    index++;
-
-                    triangles.Add(new Vector3(
-                        i + (j * vertexHeight),
-                        (i + 1) + ((j + 1) * vertexHeight),
-                        (i) + ((j + 1) * vertexHeight)
-                        ));
-
-                    fileData.AppendLine($"f {triangles[index].x} {triangles[index].y} {triangles[index].z}");
+                    fileData.AppendLine($"f {triangles[index].x + 1} {triangles[index].y + 1} {triangles[index].z + 1}");
 
                     index++;
-                    Task.Yield();
+
+                    triangles.Add(new Vector3(b, d, c));
+
+                    fileData.AppendLine($"f {triangles[index].x + 1} {triangles[index].y + 1} {triangles[index].z + 1}");
+
+                    index++;
                 }
             }
 
@@ -146,11 +146,11 @@ namespace TerrainGenerationTool.Model
             index = 0;
             for (int i = 0; i < triangles.Count; i++)
             {
-                Debug.WriteLine($"Triangle {i} of {triangles.Count}");
-                Debug.WriteLine($"Vertex Indicies: {triangles[i].x}, {triangles[i].y}, {triangles[i].z} of {verticies.Count}");
-                Vector3F a = new Vector3F(verticies[triangles[i].x - 1].x, verticies[triangles[i].x - 1].y, verticies[triangles[i].x - 1].z);
-                Vector3F b = new Vector3F(verticies[triangles[i].y - 1].x, verticies[triangles[i].y - 1].y, verticies[triangles[i].y - 1].z);
-                Vector3F c = new Vector3F(verticies[triangles[i].z - 1].x, verticies[triangles[i].z - 1].y, verticies[triangles[i].z - 1].z);
+                //Debug.WriteLine($"Triangle {i} of {triangles.Count}");
+                //Debug.WriteLine($"Vertex Indicies: {triangles[i].x}, {triangles[i].y}, {triangles[i].z} of {verticies.Count}");
+                Vector3F a = new Vector3F(verticies[triangles[i].x].x, verticies[triangles[i].x].y, verticies[triangles[i].x].z);
+                Vector3F b = new Vector3F(verticies[triangles[i].y].x, verticies[triangles[i].y].y, verticies[triangles[i].y].z);
+                Vector3F c = new Vector3F(verticies[triangles[i].z].x, verticies[triangles[i].z].y, verticies[triangles[i].z].z);
 
                 Vector3F ab = b - a;
                 Vector3F ac = c - a;
@@ -158,11 +158,9 @@ namespace TerrainGenerationTool.Model
                 Vector3F cross = Vector3F.Cross(ab, ac);
                 Vector3F normal = Vector3F.Normalise(cross);
 
-                normals[triangles[i].x - 1] += normal;
-                normals[triangles[i].y - 1] += normal;
-                normals[triangles[i].z - 1] += normal;
-
-                Task.Yield();
+                normals[triangles[i].x] += normal;
+                normals[triangles[i].y] += normal;
+                normals[triangles[i].z] += normal;
             }
 
             MessageBox.Show("Generated normals", "Normals", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
@@ -174,8 +172,6 @@ namespace TerrainGenerationTool.Model
                 normals[i] = Vector3F.Normalise(normals[i]);
                 fileData.AppendLine($"vn {normals[i].x} {normals[i].y} {normals[i].z}");
                 //Debug.WriteLine($"Normal {i}: {normals[i].x}, {normals[i].y}, {normals[i].z}");
-
-                Task.Yield();
             }
 
             MessageBox.Show("Completed normals", "Normals", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
