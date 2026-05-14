@@ -44,14 +44,15 @@ namespace TerrainGenerationTool.Model
             List<Vector3> triangles = new List<Vector3>();
             StringBuilder fileData = new StringBuilder(4 * (vertexHeight * vertexWidth));
 
+            int index = 0;
+
             /*
-             * ---------
-             * Verticies
-             * ---------
+             * ------------------
+             * Generate Verticies
+             * ------------------
             **/
 
-            int index = 0;
-            for(int i = -scale.x; i <= scale.x; i++)
+            for (int i = -scale.x; i <= scale.x; i++)
             {
                 for (int j = -scale.y; j <= scale.y; j++)
                 {
@@ -62,41 +63,8 @@ namespace TerrainGenerationTool.Model
                     float height = saturation * magnitude;
 
                     verticies.Add(new Vector3F() { x = i, y = height, z = j });
-
-                    fileData.AppendLine($"v {verticies[index].x} {verticies[index].y} {verticies[index].z }");
-
-                    index++;
                 }
             }
-
-            fileData.AppendLine("");
-
-            MessageBox.Show("Completed verticies", "verticies", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
-
-            /*
-             * -------------------
-             * Texture Coordinates
-             * -------------------
-            **/
-
-            const float baseTile = 1.0f;
-            const float tileScale = 3.0f;
-
-            for (int i = 0; i < verticies.Count; i++)
-            {
-                float steepness = 1.0f - Math.Abs(verticies[i].y);
-                float steepScale = 1.0f + (steepness * tileScale);
-                float totalScale = baseTile * steepScale;
-
-                float u = ((verticies[i].x - (-scale.x)) / (2 * scale.x)) * totalScale;
-                float v = ((verticies[i].z - (-scale.y)) / (2 * scale.y)) * totalScale;
-
-                fileData.AppendLine($"vt {u} {v}");
-            }
-
-            fileData.AppendLine("");
-
-            MessageBox.Show("Completed texture coords", "Textre Coords", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
 
             /*
              * -----
@@ -104,9 +72,6 @@ namespace TerrainGenerationTool.Model
              * -----
             **/
 
-            fileData.AppendLine("s1");
-
-            index = 0;
             for (int i = 0; i < vertexWidth - 1; i++)
             {
                 for (int j = 0; j < vertexHeight - 1; j++)
@@ -117,25 +82,14 @@ namespace TerrainGenerationTool.Model
                     int d = (j + 1) + ((i + 1) * vertexHeight);
 
                     triangles.Add(new Vector3(a, b, c));
-
-                    fileData.AppendLine($"f {triangles[index].x + 1} {triangles[index].y + 1} {triangles[index].z + 1}");
-
-                    index++;
-
                     triangles.Add(new Vector3(b, d, c));
-
-                    fileData.AppendLine($"f {triangles[index].x + 1} {triangles[index].y + 1} {triangles[index].z + 1}");
-
-                    index++;
                 }
             }
 
-            MessageBox.Show("Completed Triangles", "Triangles", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
-
             /*
-             * -------
-             * Normals
-             * -------
+             * ----------------
+             * Generate Normals
+             * ----------------
             **/
 
             for (int i = 0; i < verticies.Count; i++)
@@ -146,8 +100,6 @@ namespace TerrainGenerationTool.Model
             index = 0;
             for (int i = 0; i < triangles.Count; i++)
             {
-                //Debug.WriteLine($"Triangle {i} of {triangles.Count}");
-                //Debug.WriteLine($"Vertex Indicies: {triangles[i].x}, {triangles[i].y}, {triangles[i].z} of {verticies.Count}");
                 Vector3F a = new Vector3F(verticies[triangles[i].x].x, verticies[triangles[i].x].y, verticies[triangles[i].x].z);
                 Vector3F b = new Vector3F(verticies[triangles[i].y].x, verticies[triangles[i].y].y, verticies[triangles[i].y].z);
                 Vector3F c = new Vector3F(verticies[triangles[i].z].x, verticies[triangles[i].z].y, verticies[triangles[i].z].z);
@@ -163,22 +115,48 @@ namespace TerrainGenerationTool.Model
                 normals[triangles[i].z] += normal;
             }
 
-            MessageBox.Show("Generated normals", "Normals", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
-
-            // Must Normalise the normals
-
+            // Normalise the normals
             for (int i = 0; i < normals.Count; i++)
             {
                 normals[i] = Vector3F.Normalise(normals[i]);
-                fileData.AppendLine($"vn {normals[i].x} {normals[i].y} {normals[i].z}");
-                //Debug.WriteLine($"Normal {i}: {normals[i].x}, {normals[i].y}, {normals[i].z}");
             }
 
-            MessageBox.Show("Completed normals", "Normals", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
+            /*
+             * -------------------
+             * Texture Coordinates
+             * -------------------
+            **/
+
+            for (int i = 0; i < verticies.Count; i++)
+            {
+
+                float u = ((verticies[i].x - (-scale.x)) / (2 * scale.x));
+                float v = ((verticies[i].z - (-scale.y)) / (2 * scale.y));
+
+                textureCoords.Add(new Vector2F(u, v));
+            }
 
             //////
+            /////
 
-            //Debug.Write(fileData);
+            for (int i = 0; i < verticies.Count; i++)
+                fileData.AppendLine($"v {verticies[i].x} {verticies[i].y} {verticies[i].z}");
+
+            fileData.AppendLine("");
+
+            for (int i = 0; i < textureCoords.Count; i++)
+                fileData.AppendLine($"vt {textureCoords[i].x} {textureCoords[i].y}");
+
+            fileData.AppendLine("");
+            fileData.AppendLine("s1");
+
+            for (int i = 0; i < normals.Count; i++)
+                fileData.AppendLine($"vn {normals[i].x} {normals[i].y} {normals[i].z}");
+
+            fileData.AppendLine("");
+
+            for (int i = 0; i < triangles.Count; i++)
+                fileData.AppendLine($"f {triangles[i].x + 1} {triangles[i].y + 1} {triangles[i].z + 1}");
 
             return fileData.ToString();
         }
