@@ -21,7 +21,7 @@ namespace TerrainGenerationTool.Model
         """;
 
 
-        public string CreateObjFile(Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
+        public string CreateObjFile(Action<GenerationState> reportState, Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
         {
             int vertexWidth = scale.x * 2 + 1;
             int vertexHeight = vertexWidth;
@@ -44,13 +44,14 @@ namespace TerrainGenerationTool.Model
             List<Vector3> triangles = new List<Vector3>();
             StringBuilder fileData = new StringBuilder(4 * (vertexHeight * vertexWidth));
 
-            int index = 0;
 
             /*
              * ------------------
              * Generate Verticies
              * ------------------
             **/
+
+            reportState(GenerationState.GeneratingVerticies);
 
             for (int i = -scale.x; i <= scale.x; i++)
             {
@@ -72,6 +73,8 @@ namespace TerrainGenerationTool.Model
              * -----
             **/
 
+            reportState(GenerationState.GeneratingFaces);
+
             for (int i = 0; i < vertexWidth - 1; i++)
             {
                 for (int j = 0; j < vertexHeight - 1; j++)
@@ -92,12 +95,13 @@ namespace TerrainGenerationTool.Model
              * ----------------
             **/
 
+            reportState(GenerationState.GeneratingNormals);
+
             for (int i = 0; i < verticies.Count; i++)
                 normals.Add(new Vector3F(0, 0, 0));
 
             // Bottleneck here - due to the Normalise function using square roots
 
-            index = 0;
             for (int i = 0; i < triangles.Count; i++)
             {
                 Vector3F a = new Vector3F(verticies[triangles[i].x].x, verticies[triangles[i].x].y, verticies[triangles[i].x].z);
@@ -127,6 +131,8 @@ namespace TerrainGenerationTool.Model
              * -------------------
             **/
 
+            reportState(GenerationState.GeneratingUVs);
+
             for (int i = 0; i < verticies.Count; i++)
             {
 
@@ -138,6 +144,8 @@ namespace TerrainGenerationTool.Model
 
             //////
             /////
+
+            reportState(GenerationState.GeneratingFile);
 
             for (int i = 0; i < verticies.Count; i++)
                 fileData.AppendLine($"v {verticies[i].x} {verticies[i].y} {verticies[i].z}");

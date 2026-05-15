@@ -15,5 +15,6 @@
         <TextBox x:Name="SizeXTextBox" HorizontalAlignment="Left" Margin="131,109,0,0" TextWrapping="Wrap" Text="{Binding XValue}" VerticalAlignment="Top" Width="50" />
         <TextBox x:Name="SizeYTextBox" HorizontalAlignment="Left" Margin="191,109,0,0" TextWrapping="Wrap" Text="{Binding YValue}" VerticalAlignment="Top" Width="50"/>
         <TextBox x:Name="MagnitudeTextBox" HorizontalAlignment="Left" Margin="131,149,0,0" TextWrapping="Wrap" Text="{Binding MagnitudeValue}" VerticalAlignment="Top" Width="100"/>
+        <TextBlock x:Name="StatusText" HorizontalAlignment="Left" Margin="131,199,0,0" TextWrapping="Wrap" Text="{Binding StatusValue}" VerticalAlignment="Top" Width="100"/>
     </Grid>
 </Window>

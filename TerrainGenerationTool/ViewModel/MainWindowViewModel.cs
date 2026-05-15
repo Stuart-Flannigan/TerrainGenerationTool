@@ -38,6 +38,10 @@ namespace TerrainGenerationTool.ViewModel
 
         private string defaultMagnitudeValue;
 
+        private string? statusValue;
+        public string StatusValue { get => statusValue ??= defaultStatusValue; set { statusValue = value; OnPropertyChanged(nameof(StatusValue)); } }
+        private string defaultStatusValue;
+
         public MainWindowViewModel()
         {
             defaultFilePathText = Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, "Assets", "TestMap.bmp");
@@ -47,6 +51,7 @@ namespace TerrainGenerationTool.ViewModel
             defaultXValue = "63";
             defaultYValue = "63";
             defaultMagnitudeValue = "10.0";
+            defaultStatusValue = "Not Started";
 
             Vector3F a = new Vector3F(2, 3, 5);
 
@@ -61,26 +66,13 @@ namespace TerrainGenerationTool.ViewModel
             FilePath = (!string.IsNullOrEmpty(path = fileManager.SelectFile("Select Image", "Bitmap files (*.bmp)|*.bmp")) ? path : FilePath);
         }
 
-        private void SaveObj()
+        private async void SaveObj()
         {
-            string msgBoxText = "Generating OBJ";
-            string cap = "Generating...";
-            MessageBoxButton btn = MessageBoxButton.OK;
-            MessageBoxImage icn = MessageBoxImage.Exclamation;
-            MessageBoxResult rst = MessageBoxResult.Yes;
-
-            MessageBox.Show(msgBoxText, cap, btn, icn, rst);
-
-            OBJManager objManager = new OBJManager();
             Bitmap heightmap = new Bitmap(FilePath);
-            string modelData = objManager.CreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue));
+            string modelData = await RunCreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue));
 
             FileManager fileManager = new FileManager();
-            if (fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))
-            {
-                //Successfully made file
-            }
-            else
+            if (!fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))
             {
                 string messageBoxText = "There was an error creating an OBJ file.";
                 string caption = "Error";
@@ -90,6 +82,28 @@ namespace TerrainGenerationTool.ViewModel
 
                 result = MessageBox.Show(messageBoxText, caption, button, icon, result);
             }
+        }
+
+        public async Task<string> RunCreateObjFile(Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
+        {
+            OBJManager objManager = new OBJManager();
+            return await Task.Run(() => objManager.CreateObjFile(UpdateGenerationState, scale, heightmap, magnitude));
+        }
+
+        private void UpdateGenerationState(GenerationState state)
+        {
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                StatusValue = state switch
+                {
+                    GenerationState.GeneratingVerticies => "Generating Verticies...",
+                    GenerationState.GeneratingFaces => "Generating Faces...",
+                    GenerationState.GeneratingNormals => "Generating Normals...",
+                    GenerationState.GeneratingUVs => "Generating UVs...",
+                    GenerationState.GeneratingFile => "Generating File...",
+                    _ => ""
+                };
+            });
         }
     }
 }
