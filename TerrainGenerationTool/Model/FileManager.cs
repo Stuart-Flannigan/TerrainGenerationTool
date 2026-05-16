@@ -29,7 +29,7 @@ namespace TerrainGenerationTool.Model
             return string.Empty;
         }
 
-        public string SaveFilePath(StringBuilder dataToWrite, string title = "Save File", string filter = "All files (*.*)|*.*")
+        public string SaveFilePath(string title = "Save File", string filter = "All files (*.*)|*.*")
         {
             SaveFileDialog fileDialog = new SaveFileDialog
             {

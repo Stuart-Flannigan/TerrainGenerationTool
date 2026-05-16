@@ -44,8 +44,6 @@ namespace TerrainGenerationTool.Model
             List<Vector2F> textureCoords = new List<Vector2F>();
             List<Vector3F> normals = new List<Vector3F>();
             List<Vector3> triangles = new List<Vector3>();
-            StringBuilder fileData = new StringBuilder(4 * (vertexHeight * vertexWidth));
-
 
             /*
              * ------------------
@@ -181,7 +179,7 @@ namespace TerrainGenerationTool.Model
 
             reportState(GenerationState.GeneratingFile);
 
-            string filePath = fileManager.SaveFilePath(fileData, "Save OBJ", "Bitmap files (*.obj)|*.obj");
+            string filePath = fileManager.SaveFilePath("Save OBJ", "Bitmap files (*.obj)|*.obj");
 
             if(String.IsNullOrEmpty(filePath))
             {
@@ -240,5 +238,7 @@ namespace TerrainGenerationTool.Model
             reportState(GenerationState.Completed);
             return true;
         }
+
+        private bool SaveData()
     }
 }
