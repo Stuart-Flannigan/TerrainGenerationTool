@@ -51,7 +51,9 @@ namespace TerrainGenerationTool.ViewModel
             defaultXValue = "63";
             defaultYValue = "63";
             defaultMagnitudeValue = "10.0";
-            defaultStatusValue = "Not Started";
+            defaultStatusValue = "Status: Not Started";
+
+            UpdateGenerationState(GenerationState.NotStarted);
 
             Vector3F a = new Vector3F(2, 3, 5);
 
@@ -69,38 +71,30 @@ namespace TerrainGenerationTool.ViewModel
         private async void SaveObj()
         {
             Bitmap heightmap = new Bitmap(FilePath);
-            string modelData = await RunCreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, float.Parse(MagnitudeValue));
-
             FileManager fileManager = new FileManager();
-            if (!fileManager.GenerateObj(modelData, "Save OBJ", "Bitmap files (*.obj)|*.obj"))
-            {
-                string messageBoxText = "There was an error creating an OBJ file.";
-                string caption = "Error";
-                MessageBoxButton button = MessageBoxButton.OK;
-                MessageBoxImage icon = MessageBoxImage.Error;
-                MessageBoxResult result = MessageBoxResult.Yes;
-
-                result = MessageBox.Show(messageBoxText, caption, button, icon, result);
-            }
+            bool success = await RunCreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, fileManager, float.Parse(MagnitudeValue));
         }
 
-        public async Task<string> RunCreateObjFile(Vector2 scale, Bitmap heightmap, float magnitude = 1.0f)
+        public async Task<bool> RunCreateObjFile(Vector2 scale, Bitmap heightmap, FileManager fileManager, float magnitude = 1.0f)
         {
             OBJManager objManager = new OBJManager();
-            return await Task.Run(() => objManager.CreateObjFile(UpdateGenerationState, scale, heightmap, magnitude));
+            return await Task.Run(() => objManager.CreateObjFile(UpdateGenerationState, scale, heightmap, fileManager, magnitude));
         }
 
         private void UpdateGenerationState(GenerationState state)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {
-                StatusValue = state switch
+                StatusValue = "Status: " + state switch
                 {
+                    GenerationState.NotStarted => "Not Started.",
                     GenerationState.GeneratingVerticies => "Generating Verticies...",
                     GenerationState.GeneratingFaces => "Generating Faces...",
                     GenerationState.GeneratingNormals => "Generating Normals...",
                     GenerationState.GeneratingUVs => "Generating UVs...",
                     GenerationState.GeneratingFile => "Generating File...",
+                    GenerationState.Cancelled => "Cancelled.",
+                    GenerationState.Completed => "Completed.",
                     _ => ""
                 };
             });

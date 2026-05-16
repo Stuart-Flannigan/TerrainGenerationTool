@@ -7,14 +7,47 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Image x:Name="HeightmapImage" HorizontalAlignment="Left" Height="100" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Source="{Binding FilePath}"/>
-        <TextBlock HorizontalAlignment="Left" Margin="131,21,0,0" TextWrapping="Wrap" Text="Heightmap" VerticalAlignment="Top"/>
-        <TextBox x:Name="PathTextBox" HorizontalAlignment="Left" Margin="131,51,0,0" TextWrapping="Wrap" Text="{Binding FilePath}" VerticalAlignment="Top" Width="300"/>
-        <Button x:Name="PathButton" Content="Select" HorizontalAlignment="Left" Margin="436,49,0,0" VerticalAlignment="Top" Command="{Binding SelectCommand}"/>
-        <Button x:Name="SaveButton" Content="Save" HorizontalAlignment="Left" Margin="436,86,0,0" VerticalAlignment="Top" Command="{Binding SaveCommand}"/>
-        <TextBox x:Name="SizeXTextBox" HorizontalAlignment="Left" Margin="131,109,0,0" TextWrapping="Wrap" Text="{Binding XValue}" VerticalAlignment="Top" Width="50" />
-        <TextBox x:Name="SizeYTextBox" HorizontalAlignment="Left" Margin="191,109,0,0" TextWrapping="Wrap" Text="{Binding YValue}" VerticalAlignment="Top" Width="50"/>
-        <TextBox x:Name="MagnitudeTextBox" HorizontalAlignment="Left" Margin="131,149,0,0" TextWrapping="Wrap" Text="{Binding MagnitudeValue}" VerticalAlignment="Top" Width="100"/>
-        <TextBlock x:Name="StatusText" HorizontalAlignment="Left" Margin="131,199,0,0" TextWrapping="Wrap" Text="{Binding StatusValue}" VerticalAlignment="Top" Width="100"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Image x:Name="HeightmapImage" Grid.Column="0" HorizontalAlignment="Left" Height="100" Margin="10,10,0,0" VerticalAlignment="Top" Width="100" Source="{Binding FilePath}"/>
+        <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0" Margin="5,0">
+            <StackPanel Orientation="Vertical" Grid.Column="1" Grid.Row="0">
+                <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Heightmap" VerticalAlignment="Top" Margin="3, 0"/>
+                <Grid Margin="0, 3">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" MaxWidth="1000"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox x:Name="PathTextBox" Grid.Column="0" TextWrapping="Wrap" Text="{Binding FilePath}" Margin="0,0,5,0"/>
+                    <Button x:Name="PathButton" Grid.Column="1" Content="Select" HorizontalAlignment="Right" VerticalAlignment="Top" Height="20" MaxHeight="20" Command="{Binding SelectCommand}" Margin="0,0,5,0"/>
+                </Grid>
+            </StackPanel>
+            <TextBlock Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="Terrain Size" VerticalAlignment="Top" Margin="3, 0"/>
+            <StackPanel Orientation="Horizontal" Grid.Column="1" Grid.Row="2">
+                <StackPanel>
+                    <TextBlock Text="X" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="3, 0"/>
+                    <TextBox x:Name="SizeXTextBox" TextWrapping="Wrap" Text="{Binding XValue}" Width="50" Margin="0, 0, 5, 3"/>
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="Y" Grid.Column="1" Grid.Row="1" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Margin="3, 0"/>
+                    <TextBox x:Name="SizeYTextBox" TextWrapping="Wrap" Text="{Binding YValue}" Width="50" Margin="0, 0, 5, 3"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="Heighty Strength" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Margin="3, 0"/>
+                <TextBox x:Name="MagnitudeTextBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding MagnitudeValue}"  Width="105" Margin="0, 0, 5, 3"/>
+            </StackPanel>
+            <Button x:Name="SaveButton" Grid.Column="1" Grid.Row="2" Content="Save" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding SaveCommand}"/>
+            <TextBlock x:Name="StatusText" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding StatusValue}" TextAlignment="Left" Width="auto" Margin="0, 5"/>
+        </StackPanel>
     </Grid>
 </Window>

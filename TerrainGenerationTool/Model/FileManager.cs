@@ -29,7 +29,7 @@ namespace TerrainGenerationTool.Model
             return string.Empty;
         }
 
-        public bool GenerateObj(string dataToWrite, string title = "Save File", string filter = "All files (*.*)|*.*")
+        public string SaveFilePath(StringBuilder dataToWrite, string title = "Save File", string filter = "All files (*.*)|*.*")
         {
             SaveFileDialog fileDialog = new SaveFileDialog
             {
@@ -40,10 +40,12 @@ namespace TerrainGenerationTool.Model
 
             if (fileDialog.ShowDialog() == true)
             {
-                // ToDo: Make Save
-                File.WriteAllText(fileDialog.FileName, dataToWrite);
+                return fileDialog.FileName;
             }
-            return true;
+            else
+            {
+                return String.Empty;
+            }
         }
     }
 }
