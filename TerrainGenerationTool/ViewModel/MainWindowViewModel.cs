@@ -38,6 +38,11 @@ namespace TerrainGenerationTool.ViewModel
 
         private string defaultMagnitudeValue;
 
+        private string? resolutionValue;
+        public string ResolutionValue { get => resolutionValue ??= defaultResolutionValue; set { resolutionValue = value; OnPropertyChanged(nameof(ResolutionValue)); } }
+
+        private string defaultResolutionValue;
+
         private string? statusValue;
         public string StatusValue { get => statusValue ??= defaultStatusValue; set { statusValue = value; OnPropertyChanged(nameof(StatusValue)); } }
         private string defaultStatusValue;
@@ -51,6 +56,7 @@ namespace TerrainGenerationTool.ViewModel
             defaultXValue = "63";
             defaultYValue = "63";
             defaultMagnitudeValue = "10.0";
+            defaultResolutionValue = "1.0";
             defaultStatusValue = "Status: Not Started";
 
             UpdateGenerationState(GenerationState.NotStarted);
@@ -72,13 +78,13 @@ namespace TerrainGenerationTool.ViewModel
         {
             Bitmap heightmap = new Bitmap(FilePath);
             FileManager fileManager = new FileManager();
-            bool success = await RunCreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, fileManager, float.Parse(MagnitudeValue));
+            bool success = await RunCreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, fileManager, float.Parse(MagnitudeValue), float.Parse(ResolutionValue));
         }
 
-        public async Task<bool> RunCreateObjFile(Vector2 scale, Bitmap heightmap, FileManager fileManager, float magnitude = 1.0f)
+        public async Task<bool> RunCreateObjFile(Vector2 scale, Bitmap heightmap, FileManager fileManager, float magnitude = 1.0f, float resolution = 1.0f)
         {
             OBJManager objManager = new OBJManager();
-            return await Task.Run(() => objManager.CreateObjFile(UpdateGenerationState, scale, heightmap, fileManager, magnitude));
+            return await Task.Run(() => objManager.CreateObjFile(UpdateGenerationState, scale, heightmap, fileManager, magnitude, resolution));
         }
 
         private void UpdateGenerationState(GenerationState state)

@@ -23,22 +23,19 @@ namespace TerrainGenerationTool.Model
         """;
 
 
-        public bool CreateObjFile(Action<GenerationState> reportState, Vector2 scale, Bitmap heightmap, FileManager fileManager, float magnitude = 1.0f)
+        public bool CreateObjFile(Action<GenerationState> reportState, Vector2 scale, Bitmap heightmap, FileManager fileManager, float magnitude = 1.0f, float resolutionScale = 1.0f)
         {
-            int vertexWidth = scale.x * 2 + 1;
+            int vertexWidth = (int)(scale.x * 2.0f * resolutionScale) + 1;
             int vertexHeight = vertexWidth;
 
             if (scale.x != scale.y)
-                vertexHeight = scale.y * 2 + 1;
+                vertexHeight = (int)(scale.y * 2.0f * resolutionScale) + 1;
 
             Vector2F heightmapSize = new Vector2F(heightmap.Size.Width, heightmap.Size.Height);
             Vector2F scaleDifference = new Vector2F(heightmapSize.x / (float)vertexWidth, heightmapSize.y / (float)vertexHeight);
 
-            Debug.WriteLine("");
-            Debug.WriteLine($"Vertex Size: {vertexWidth}, {vertexHeight}");
-            Debug.WriteLine($"Heightmap Size: {heightmapSize.x}, {heightmapSize.y}");
-            Debug.WriteLine($"Heightmap Scale: {scaleDifference.x}, {scaleDifference.y}");
-            Debug.WriteLine("");
+            //Vector2F heightmapStep = new Vector2F((heightmap.Width - 1) / (float)(vertexWidth - 1), (heightmap.Height - 1) / (float)(vertexHeight - 1));
+            //Vector2F vertexStep = new Vector2F((scale.x * 2) / (float)(vertexWidth - 1), (scale.y * 2) / (float)(vertexHeight - 1));
 
             List<Vector3F> verticies = new List<Vector3F>();
             List<Vector2F> textureCoords = new List<Vector2F>();
@@ -50,13 +47,13 @@ namespace TerrainGenerationTool.Model
              * Generate Verticies
              * ------------------
             **/
-            try
-            {
+            //try
+            //{
                 reportState(GenerationState.GeneratingVerticies);
 
-                for (int i = -scale.x; i <= scale.x; i++)
+                for (float i = 0; i < vertexWidth; i+= 1.0f / resolutionScale)
                 {
-                    for (int j = -scale.y; j <= scale.y; j++)
+                    for (float j = -scale.y; j <= scale.y; j+= 1.0f / resolutionScale)
                     {
                         Vector2 heightmapPos = new Vector2((int)((i + scale.x) * scaleDifference.x), (int)((j + scale.y) * scaleDifference.y));
 
@@ -67,12 +64,13 @@ namespace TerrainGenerationTool.Model
                         verticies.Add(new Vector3F() { x = i, y = height, z = j });
                     }
                 }
-            }
-            catch 
-            {
-                reportState(GenerationState.Cancelled);
-                return false;
-            }
+            //}
+            //catch
+            //{
+            //    Debug.WriteLine("Error generating verticies");
+            //    reportState(GenerationState.Cancelled);
+            //    return false;
+            //}
 
             /*
              * -----
@@ -100,6 +98,7 @@ namespace TerrainGenerationTool.Model
             }
             catch
             {
+                Debug.WriteLine("Error generating faces");
                 reportState(GenerationState.Cancelled);
                 return false;
             }
@@ -110,9 +109,9 @@ namespace TerrainGenerationTool.Model
              * ----------------
             **/
 
-            try
-            {
-                reportState(GenerationState.GeneratingNormals);
+            //try
+            //{
+            reportState(GenerationState.GeneratingNormals);
 
                 for (int i = 0; i < verticies.Count; i++)
                     normals.Add(new Vector3F(0, 0, 0));
@@ -141,12 +140,13 @@ namespace TerrainGenerationTool.Model
                 {
                     normals[i] = Vector3F.Normalise(normals[i]);
                 }
-            }
-            catch
-            {
-                reportState(GenerationState.Cancelled);
-                return false;
-            }
+            //}
+            //catch
+            //{
+            //    Debug.WriteLine("Error generating normals");
+            //    reportState(GenerationState.Cancelled);
+            //    return false;
+            //}
 
             /*
              * -------------------
@@ -169,6 +169,7 @@ namespace TerrainGenerationTool.Model
             }
             catch
             {
+                Debug.WriteLine("Error generating texture coordinates");
                 reportState(GenerationState.Cancelled);
                 return false;
             }
@@ -178,16 +179,27 @@ namespace TerrainGenerationTool.Model
             /////
 
             reportState(GenerationState.GeneratingFile);
+            return SaveData(reportState, fileManager, verticies, textureCoords, normals, triangles);
+        }
 
+        //private bool DecimateMesh(List<Vector3F> verticies, List<Vector3> triangles, float reductionPercentage)
+        //{
+        //    int targetVertexCount = (int)(verticies.Count * (1 - reductionPercentage));
+
+        //    return true;
+        //}
+
+        private bool SaveData(Action<GenerationState> reportState, FileManager fileManager, List<Vector3F> verticies, List<Vector2F> textureCoords, List<Vector3F> normals, List<Vector3> triangles)
+        {
             string filePath = fileManager.SaveFilePath("Save OBJ", "Bitmap files (*.obj)|*.obj");
 
-            if(String.IsNullOrEmpty(filePath))
+            if (String.IsNullOrEmpty(filePath))
             {
                 reportState(GenerationState.Cancelled);
                 return false;
             }
 
-            StreamWriter streamWriter = null; 
+            StreamWriter streamWriter = null;
             try
             {
                 streamWriter = new StreamWriter(filePath);
@@ -238,7 +250,5 @@ namespace TerrainGenerationTool.Model
             reportState(GenerationState.Completed);
             return true;
         }
-
-        private bool SaveData()
     }
 }

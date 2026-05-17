@@ -43,8 +43,12 @@
                 </StackPanel>
             </StackPanel>
             <StackPanel>
-                <TextBlock Text="Heighty Strength" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Margin="3, 0"/>
+                <TextBlock Text="Height Strength" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Margin="3, 0"/>
                 <TextBox x:Name="MagnitudeTextBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding MagnitudeValue}"  Width="105" Margin="0, 0, 5, 3"/>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="Resolution Scale" Grid.Column="1" Grid.Row="1" TextWrapping="Wrap" VerticalAlignment="Top" Margin="3, 0"/>
+                <TextBox x:Name="ResolutionTextBox" Grid.Column="1" Grid.Row="3" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding ResolutionValue}"  Width="105" Margin="0, 0, 5, 3"/>
             </StackPanel>
             <Button x:Name="SaveButton" Grid.Column="1" Grid.Row="2" Content="Save" HorizontalAlignment="Left" VerticalAlignment="Top" Command="{Binding SaveCommand}"/>
             <TextBlock x:Name="StatusText" Grid.Column="1" HorizontalAlignment="Left" TextWrapping="Wrap" Text="{Binding StatusValue}" TextAlignment="Left" Width="auto" Margin="0, 5"/>
