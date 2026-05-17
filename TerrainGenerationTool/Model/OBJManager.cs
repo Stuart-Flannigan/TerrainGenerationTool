@@ -32,10 +32,10 @@ namespace TerrainGenerationTool.Model
                 vertexHeight = (int)(scale.y * 2.0f * resolutionScale) + 1;
 
             Vector2F heightmapSize = new Vector2F(heightmap.Size.Width, heightmap.Size.Height);
-            Vector2F scaleDifference = new Vector2F(heightmapSize.x / (float)vertexWidth, heightmapSize.y / (float)vertexHeight);
+            //Vector2F scaleDifference = new Vector2F(heightmapSize.x / (float)vertexWidth, heightmapSize.y / (float)vertexHeight);
 
-            //Vector2F heightmapStep = new Vector2F((heightmap.Width - 1) / (float)(vertexWidth - 1), (heightmap.Height - 1) / (float)(vertexHeight - 1));
-            //Vector2F vertexStep = new Vector2F((scale.x * 2) / (float)(vertexWidth - 1), (scale.y * 2) / (float)(vertexHeight - 1));
+            Vector2F heightmapStep = new Vector2F((heightmap.Width - 1) / (float)(vertexWidth - 1), (heightmap.Height - 1) / (float)(vertexHeight - 1));
+            Vector2F vertexStep = new Vector2F((scale.x * 2) / (float)(vertexWidth - 1), (scale.y * 2) / (float)(vertexHeight - 1));
 
             List<Vector3F> verticies = new List<Vector3F>();
             List<Vector2F> textureCoords = new List<Vector2F>();
@@ -51,17 +51,19 @@ namespace TerrainGenerationTool.Model
             //{
                 reportState(GenerationState.GeneratingVerticies);
 
-                for (float i = 0; i < vertexWidth; i+= 1.0f / resolutionScale)
+                for (float i = 0; i < vertexWidth; i++)
                 {
-                    for (float j = -scale.y; j <= scale.y; j+= 1.0f / resolutionScale)
+                    for (float j = 0; j < vertexHeight; j++)
                     {
-                        Vector2 heightmapPos = new Vector2((int)((i + scale.x) * scaleDifference.x), (int)((j + scale.y) * scaleDifference.y));
+                        Vector2F globalPos = new Vector2F(-scale.x + i * vertexStep.x, -scale.y + j * vertexStep.y);
+                        Vector2 heightmapPos = new Vector2((int)Math.Clamp(Math.Round(i * heightmapStep.x), 0, heightmap.Width - 1), (int)Math.Clamp(Math.Round(j * heightmapStep.y), 0, heightmap.Height - 1));
+
 
                         Color pixelColour = heightmap.GetPixel(heightmapPos.x, heightmapPos.y);
                         float saturation = ((pixelColour.R / 255f) + (pixelColour.G / 255f) + (pixelColour.B / 255f)) / 3;
                         float height = saturation * magnitude;
 
-                        verticies.Add(new Vector3F() { x = i, y = height, z = j });
+                        verticies.Add(new Vector3F(globalPos.x, height, globalPos.y));
                     }
                 }
             //}
