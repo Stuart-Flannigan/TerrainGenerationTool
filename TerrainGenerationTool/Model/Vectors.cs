@@ -1,85 +1,85 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 
 namespace TerrainGenerationTool.Model
 {
-    struct Vector2
+    struct Vector2<T> where T : INumber<T>
     {
-        public int x, y;
+        public T x, y;
 
-        public Vector2(int x, int y)
+        public Vector2(T x, T y)
         {
             this.x = x;
             this.y = y;
         }
-    }
 
-    struct Vector2F
-    {
-        public float x, y;
-
-        public Vector2F(float x, float y)
+        public static Vector2<T> operator +(Vector2<T> a, Vector2<T> b)
         {
-            this.x = x;
-            this.y = y;
+            return new Vector2<T>(a.x + b.x, a.y + b.y);
+        }
+
+
+        public static Vector2<T> operator -(Vector2<T> a, Vector2<T> b)
+        {
+            return new Vector2<T>(a.x - b.x, a.y - b.y);
+        }
+
+        public Vector2<U> Cast<U>() where U : INumber<U>
+        {
+            return new Vector2<U>(U.CreateChecked(this.x), U.CreateChecked(this.y));
         }
     }
 
-    struct Vector3
+    struct Vector3<T> where T : INumber<T>
     {
-        public int x, y, z;
+        public T x, y, z;
 
-        public Vector3(int x, int y, int z)
-        {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-    }
-    struct Vector3F
-    {
-        public float x, y, z;
-
-        public Vector3F(float x, float y, float z)
+        public Vector3(T x, T y, T z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
         }
 
-        public static Vector3F operator +(Vector3F a, Vector3F b)
+        public static Vector3<T> operator +(Vector3<T> a, Vector3<T> b)
         {
-            return new Vector3F(a.x + b.x, a.y + b.y, a.z + b.z);
+            return new Vector3<T>(a.x + b.x, a.y + b.y, a.z + b.z);
         }
 
 
-        public static Vector3F operator -(Vector3F a, Vector3F b)
+        public static Vector3<T> operator -(Vector3<T> a, Vector3<T> b)
         {
-            return new Vector3F(a.x - b.x, a.y - b.y, a.z - b.z);
+            return new Vector3<T>(a.x - b.x, a.y - b.y, a.z - b.z);
         }
 
-        public static Vector3F Cross(Vector3F a, Vector3F b)
+        public Vector3<U> Cast<U>() where U : INumber<U>
         {
-            return new Vector3F(
+            return new Vector3<U>(U.CreateChecked(this.x), U.CreateChecked(this.y), U.CreateChecked(this.z));
+        }
+
+        public static Vector3<T> Cross(Vector3<T> a, Vector3<T> b)
+        {
+            return new Vector3<T>(
                 a.y * b.z - a.z * b.y,
                 a.z* b.x - a.x * b.z,
                 a.x * b.y - a.y * b.x
                 );
         }
 
-        public static Vector3F Normalise(Vector3F vector)
+        public static Vector3<double> Normalise(Vector3<T> vector)
         {
             double magnitude = Magnitude(vector);
 
-            float oldX = vector.x;
-            float oldY = vector.y;
-            float oldZ = vector.z;
+            double oldX = double.CreateChecked(vector.x);
+            double oldY = double.CreateChecked(vector.y);
+            double oldZ = double.CreateChecked(vector.z);
 
-            Vector3F newXYZ = new Vector3F(
-                vector.x / (float)magnitude,
-                vector.y / (float)magnitude,
-                vector.z / (float)magnitude
+            Vector3<double> newXYZ = new Vector3<double>(
+                double.CreateChecked(vector.x) / magnitude,
+                double.CreateChecked(vector.y) / magnitude,
+                double.CreateChecked(vector.z) / magnitude
                 );
 
             if(oldX == 0)
@@ -92,9 +92,9 @@ namespace TerrainGenerationTool.Model
             return newXYZ;
         }
 
-        public static double Magnitude(Vector3F vector)
+        public static double Magnitude(Vector3<T> vector)
         {
-            return Math.Sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+            return Math.Sqrt(double.CreateChecked(vector.x * vector.x) + double.CreateChecked(vector.y * vector.y) + double.CreateChecked(vector.z * vector.z));
         }
     }
 

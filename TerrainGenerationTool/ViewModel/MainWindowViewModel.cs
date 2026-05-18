@@ -60,11 +60,6 @@ namespace TerrainGenerationTool.ViewModel
             defaultStatusValue = "Status: Not Started";
 
             UpdateGenerationState(GenerationState.NotStarted);
-
-            Vector3F a = new Vector3F(2, 3, 5);
-
-            double mag = Vector3F.Magnitude(a);
-            Debug.WriteLine($"Mag: {mag}");
         }
 
         private void SelectFile()
@@ -78,10 +73,10 @@ namespace TerrainGenerationTool.ViewModel
         {
             Bitmap heightmap = new Bitmap(FilePath);
             FileManager fileManager = new FileManager();
-            bool success = await RunCreateObjFile(new Vector2(int.Parse(XValue), int.Parse(YValue)), heightmap, fileManager, float.Parse(MagnitudeValue), float.Parse(ResolutionValue));
+            bool success = await RunCreateObjFile(new Vector2<int>(int.Parse(XValue), int.Parse(YValue)), heightmap, fileManager, float.Parse(MagnitudeValue), float.Parse(ResolutionValue));
         }
 
-        public async Task<bool> RunCreateObjFile(Vector2 scale, Bitmap heightmap, FileManager fileManager, float magnitude = 1.0f, float resolution = 1.0f)
+        public async Task<bool> RunCreateObjFile(Vector2<int> scale, Bitmap heightmap, FileManager fileManager, float magnitude = 1.0f, float resolution = 1.0f)
         {
             OBJManager objManager = new OBJManager();
             return await Task.Run(() => objManager.CreateObjFile(UpdateGenerationState, scale, heightmap, fileManager, magnitude, resolution));
